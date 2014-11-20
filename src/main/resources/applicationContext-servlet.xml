@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:aop="http://www.springframework.org/schema/aop" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+        http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+    <!-- 自动扫描com.xiongyingqi.web 包下的@Controller标注的类控制器类 -->
+    <context:component-scan base-package="com.kingray.event"></context:component-scan>
+    <context:component-scan base-package="com.kingray.profile"></context:component-scan>
+    <context:component-scan base-package="com.kingray.session"></context:component-scan>
+    <context:component-scan base-package="com.kingray.web"></context:component-scan>
+    <context:component-scan base-package="com.kingray.filter"></context:component-scan>
+    <context:component-scan base-package="com.kingray.spring.http.convert"></context:component-scan>
+    <context:component-scan base-package="com.kingray.json.filter.aop"></context:component-scan>
+    <context:component-scan base-package="com.kingray.support.login.handler"></context:component-scan>
+
+    <!-- 启动mvc对aop的支持,使用aspectj代理 -->
+    <aop:aspectj-autoproxy proxy-target-class="true"/>
+
+    <!-- 以下 validator  ConversionService 在使用 mvc:annotation-driven 会 自动注册-->
+    <bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean">
+        <property name="providerClass" value="org.hibernate.validator.HibernateValidator"/>
+    </bean>
+
+    <!--<bean class="com.kingray.spring.http.convert.DateConverter"></bean>-->
+
+    <!-- 类型转换及数据格式化 -->
+    <bean id="conversionService" class="org.springframework.format.support.FormattingConversionServiceFactoryBean">
+        <property name="converters">
+            <set>
+                <bean class="com.kingray.spring.http.convert.SqlDateConverter"/>
+                <bean class="com.kingray.spring.http.convert.UtilDateConverter"/>
+            </set>
+        </property>
+    </bean>
+
+    <!--<bean
+            class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
+        <property name="cacheSeconds" value="0"/>
+        &lt;!&ndash;日期格式转换 &ndash;&gt;
+        <property name="webBindingInitializer">
+            <bean class="com.kingray.spring.http.convert.DateConverter"/>
+        </property>
+        <property name="messageConverters">
+            <list>
+                <bean
+                        class="com.kingray.spring.http.convert.json.Jackson2HttpMessageConverter">
+                </bean>
+                <bean
+                        class="com.kingray.spring.http.convert.json.JacksonHttpMessageConverter">
+                </bean>
+                <bean
+                        class="org.springframework.http.converter.BufferedImageHttpMessageConverter">
+                </bean>
+                <bean
+                        class="org.springframework.http.converter.ResourceHttpMessageConverter">
+                </bean>
+                <bean class="org.springframework.http.converter.FormHttpMessageConverter">
+                </bean>
+                <bean
+                        class="org.springframework.http.converter.support.AllEncompassingFormHttpMessageConverter">
+                </bean>
+                <bean
+                        class="org.springframework.http.converter.xml.Jaxb2RootElementHttpMessageConverter">
+                </bean>
+                <bean
+                        class="org.springframework.http.converter.feed.AtomFeedHttpMessageConverter">
+                </bean>
+                <bean
+                        class="org.springframework.http.converter.feed.RssChannelHttpMessageConverter">
+                </bean>
+                <bean
+                        class="org.springframework.http.converter.xml.Jaxb2CollectionHttpMessageConverter">
+                </bean>
+                <bean
+                        class="org.springframework.http.converter.xml.SourceHttpMessageConverter">
+                </bean>
+                <bean
+                        class="org.springframework.http.converter.ByteArrayHttpMessageConverter">
+                </bean>
+            </list>
+        </property>
+        <property name="customArgumentResolvers">
+            <list>
+                <bean
+                        class="com.kingray.spring.mvc.method.annotation.RequestJsonParamMethodArgumentResolver"/>
+                <bean
+                        class="com.kingray.spring.mvc.method.annotation.FormModelMethodArgumentResolver"/>
+            </list>
+        </property>
+    </bean>-->
+
+    <!-- 启动Spring MVC的注解功能，完成请求和注解POJO的映射 3.2之后舍弃 <mvc:annotation-driven /><mvc:annotation-driven
+        validator="validator" conversion-service="conversionService" /> -->
+    <!-- <bean class="org.springframework.http.converter.StringHttpMessageConverter">
+        <property name="supportedMediaTypes"> <list> <value>text/plain;charset=UTF-8</value>
+        <value>text/html;charset=UTF-8</value> </list> </property> </bean> <bean
+        class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+        <property name="supportedMediaTypes"> <list> <value>application/json; charset=UTF-8</value>
+        <value>application/x-www-form-urlencoded; charset=UTF-8</value> </list> </property>
+        </bean> -->
+    <!-- 日期转换 必须放在<mvc:annotation-driven />前面 -->
+    <mvc:annotation-driven validator="validator" conversion-service="conversionService">
+        <!-- 加入org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter配置之后这里就舍弃-->
+        <mvc:message-converters register-defaults="true">
+            <bean class="com.kingray.spring.http.convert.json.Jackson2HttpMessageConverter">
+            </bean>
+            <bean class="com.kingray.spring.http.convert.json.JacksonHttpMessageConverter">
+            </bean>
+            <!--<bean class="com.kingray.spring.http.convert.CustomerDateConverter"></bean>-->
+        </mvc:message-converters>
+        <mvc:argument-resolvers>
+            <bean
+                    class="com.kingray.spring.mvc.method.annotation.RequestJsonParamMethodArgumentResolver"/>
+            <bean
+                    class="com.kingray.spring.mvc.method.annotation.FormModelMethodArgumentResolver"/>
+        </mvc:argument-resolvers>
+    </mvc:annotation-driven>
+
+    <!--拦截器配置 -->
+    <mvc:interceptors>
+        <mvc:interceptor>
+            <mvc:mapping path="/**"/>
+            <ref bean="webContextInterceptor"/>
+        </mvc:interceptor>
+        <mvc:interceptor>
+            <mvc:mapping path="/**"/>
+            <ref bean="exceptionInterceptor"/>
+        </mvc:interceptor>
+        <mvc:interceptor>
+            <mvc:mapping path="/**"/>
+            <ref bean="cookieInterceptor"/>
+        </mvc:interceptor>
+    </mvc:interceptors>
+    <!--<bean id="exceptionInterceptor" class="com.kingray.web.interceptor.ExceptionInterceptor"></bean>-->
+
+    <!-- <bean id="handlerMapping" class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping">
+        <property name="interceptors"> <list> <ref bean="logInterceptor" /> </list>
+        </property> </bean> -->
+
+    <!-- <bean id="logInterceptor" class="com.kingray.web.interceptor.LogInterceptor">
+        </bean> -->
+
+    <!-- 文件上传配置 -->
+    <bean id="multipartResolver" class="com.kingray.web.file.CommonsMultipartResolver"
+          p:defaultEncoding="UTF-8" p:maxUploadSize="9223372036854775807"
+          p:uploadTempDir="upload/temp">
+    </bean>
+
+    <!-- 类型转换及数据格式化 -->
+    <!-- <bean id="conversionService" class="org.springframework.format.support.FormattingConversionServiceFactoryBean"
+        /> -->
+
+    <!-- <bean id="webBindingInitializer" class="org.springframework.web.bind.support.ConfigurableWebBindingInitializer">
+        <property name="conversionService" ref="conversionService" /> <property name="validator"
+        ref="validator" /> </bean> -->
+    <!-- validator -->
+    <!--<bean id="validator"
+          class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean">
+        <property name="providerClass" value="org.hibernate.validator.HibernateValidator"
+                />
+    </bean>-->
+
+    <!-- 修改springmvc的默认messageConverters配置 -->
+    <!-- <bean id="conversionService" class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+        <property name="messageConverters"> <array> <bean class="org.springframework.http.converter.xml.MarshallingHttpMessageConverter">
+        <property name="marshaller" ref="castorMarshaller" /> <property name="unmarshaller"
+        ref="castorMarshaller" /> </bean> </array> </property> </bean> -->
+    <bean id="castorMarshaller" class="org.springframework.oxm.castor.CastorMarshaller"/>
+
+    <!-- 对模型视图名称的解析，在请求时模型视图名称添加前后缀 -->
+    <bean
+            class="org.springframework.web.servlet.view.InternalResourceViewResolver"
+            p:prefix="/WEB-INF/pages/" p:suffix=".jsp"/>
+
+</beans>

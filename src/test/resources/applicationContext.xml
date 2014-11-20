@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+    ">
+    <!-- <bean class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor"
+        /> -->
+
+
+    <!--导入资源，如果不这样做那么在maven多模块的环境下会出现资源加载问题-->
+    <!--<import resource="classpath:applicationContext-log.xml"/>-->
+    <import resource="classpath:applicationContext-servlet.xml"/>
+    <import resource="classpath:applicationContext-servlet-aop.xml"/>
+    <!--<import resource="classpath*:applicationContext-quartz.xml"/>-->
+    <!-- 导入其他不需要顺序的spring配置，glassfish下使用classpath*:applicationContext-*.xml -->
+
+    <bean class="org.springframework.beans.factory.config.CustomScopeConfigurer">
+        <property name="scopes">
+            <map>
+                <entry key="request">
+                    <bean class="org.springframework.context.support.SimpleThreadScope"/>
+                </entry>
+                <entry key="session">
+                    <bean class="org.springframework.context.support.SimpleThreadScope"/>
+                </entry>
+            </map>
+        </property>
+    </bean>
+
+    <!-- 导入以"applicationContext"开始的配置文件 -->
+    <!--<import resource="classpath*:*applicationContext-*.xml" />-->
+    <!--<import resource="classpath*:*.jar/*applicationContext-*.xml" />-->
+    <!-- <bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+        <property name="configLocation" value="classpath:/hibernate.cfg.xml"> </property>
+        </bean> -->
+
+</beans>
+  
